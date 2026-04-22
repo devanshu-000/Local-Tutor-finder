@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, send_from_directory, abort
 from flask_mysqldb import MySQL
 from werkzeug.utils import secure_filename
 import MySQLdb.cursors
@@ -36,9 +36,7 @@ os.makedirs(UPLOAD_FOLDER_VIDEOS, exist_ok=True)
 
 
 # ──────────────────────────────────────────
-#  HELPER — DictCursor (returns dicts not tuples)
-#  This means templates use tutor['name']
-#  instead of tutor[1] — no index confusion!
+#  HELPER — DictCursor
 # ──────────────────────────────────────────
 def get_cursor():
     return mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -73,6 +71,76 @@ def save_file(file, folder, max_size):
 @app.route('/')
 def home():
     return render_template('index.html')
+
+
+# ──────────────────────────────────────────
+#  STUDENT LOGIN  (new)
+# ──────────────────────────────────────────
+@app.route('/student-login')
+def student_login_page():
+    return render_template('student_login.html')
+
+
+@app.route('/student-login', methods=['POST'])
+def student_login():
+    # Simple student login — just sets the session flag.
+    # You can add real credential validation here later.
+    name = request.form.get('name', '').strip()
+    if name:
+        session['student_logged_in'] = True
+        session['student_name'] = name
+        return redirect(url_for('search'))
+    flash("Please enter your name to continue.", "error")
+    return redirect(url_for('student_login_page'))
+
+
+@app.route('/student-logout')
+def student_logout():
+    session.pop('student_logged_in', None)
+    session.pop('student_name', None)
+    return redirect(url_for('home'))
+
+
+# ──────────────────────────────────────────
+#  TUTOR LOGIN (placeholder route for index)
+# ──────────────────────────────────────────
+@app.route('/tutor-login')
+def tutor_login_page():
+    return render_template('tutor_register.html')
+
+
+# ──────────────────────────────────────────
+#  ROLE-BASED DOCUMENT ACCESS  (new)
+# ──────────────────────────────────────────
+@app.route('/view-document/<filename>')
+def view_document(filename):
+    """Students only — opens document inline in browser (no download)."""
+    if not session.get('student_logged_in'):
+        flash("Please log in as a student to view documents.", "error")
+        return redirect(url_for('student_login_page'))
+    # Serve with inline content-disposition so browser previews, not downloads
+    safe_name = secure_filename(filename)
+    directory = os.path.abspath(UPLOAD_FOLDER_DOCS)
+    return send_from_directory(
+        directory,
+        safe_name,
+        as_attachment=False   # inline — browser will preview PDF/image
+    )
+
+
+@app.route('/download-document/<filename>')
+def download_document(filename):
+    """Admin only — triggers file download."""
+    if 'admin' not in session:
+        flash("Admin access required.", "error")
+        return redirect(url_for('admin_login_page'))
+    safe_name = secure_filename(filename)
+    directory = os.path.abspath(UPLOAD_FOLDER_DOCS)
+    return send_from_directory(
+        directory,
+        safe_name,
+        as_attachment=True   # forces download
+    )
 
 
 # ──────────────────────────────────────────
@@ -222,6 +290,7 @@ def admin_login():
 
     if admin and admin['password'] == password:
         session['admin'] = admin['name']
+        session['admin_logged_in'] = True
         return redirect(url_for('admin_dashboard'))
 
     flash("Invalid Credentials ❌", "error")
@@ -303,6 +372,7 @@ def admin_tutor_detail(tutor_id):
 @app.route('/logout')
 def logout():
     session.pop('admin', None)
+    session.pop('admin_logged_in', None)
     return redirect(url_for('admin_login_page'))
 
 

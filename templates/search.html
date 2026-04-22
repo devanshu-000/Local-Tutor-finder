@@ -1,56 +1,183 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Search Tutors</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Tutors – TutorFinder</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .verified-badge { display: inline-block; background: #00c853; color: white; border-radius: 20px; padding: 3px 12px; font-size: 0.75rem; font-weight: 700; margin-left: 8px; vertical-align: middle; }
-        .tutor-card a.view-profile { display: inline-block; margin-top: 10px; background: #1a73e8; color: white; padding: 7px 18px; border-radius: 8px; text-decoration: none; font-size: 0.85rem; font-weight: 600; }
-        .tutor-card a.view-profile:hover { background: #1558b0; }
+        body { background: #f4f6fb; }
+        .tutor-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            padding: 24px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            height: 100%;
+        }
+        .tutor-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.11);
+        }
+        .tutor-avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: #e8f0fe;
+            color: #1a73e8;
+            font-size: 1.4rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .tutor-name { font-size: 1.1rem; font-weight: 700; color: #1a1a2e; margin: 0; }
+        .badge-verified {
+            background: #e6f4ea;
+            color: #1e7e34;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+        .info-label { font-size: 0.72rem; color: #999; text-transform: uppercase; letter-spacing: 0.4px; }
+        .info-value { font-size: 0.9rem; font-weight: 600; color: #333; }
+        .search-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            padding: 24px 28px;
+        }
+        .form-control, .form-select { border-radius: 8px; }
+        video { border-radius: 10px; background: #000; }
     </style>
 </head>
-<body class="bg-page bg-register">
-<div class="search-wrapper">
+<body>
 
-    <div class="filters">
-        <h2>Search Tutors</h2>
+<!-- Navbar -->
+<nav class="navbar navbar-light bg-white shadow-sm mb-4">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-primary" href="/">🎓 TutorFinder</a>
+        <div class="d-flex align-items-center gap-3">
+            {% if session.get('student_name') %}
+            <span class="text-muted small">👤 {{ session['student_name'] }}</span>
+            <a href="/student-logout" class="btn btn-sm btn-outline-secondary rounded-3">Logout</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+<div class="container pb-5">
+
+    <!-- Search Bar -->
+    <div class="search-card mb-4">
+        <h5 class="fw-bold mb-3">🔍 Find a Tutor</h5>
         <form method="GET" action="/search">
-            <input type="text" name="subject"  placeholder="Enter Subject">
-            <input type="text" name="location" placeholder="Enter Location">
-            <select name="mode">
-                <option value="">Any Mode</option>
-                <option value="Online">Online</option>
-                <option value="Offline">Offline</option>
-            </select>
-            <button type="submit">Search</button>
+            <div class="row g-2 align-items-end">
+                <div class="col-12 col-md-5">
+                    <label class="form-label small fw-semibold text-muted">Subject</label>
+                    <input type="text" name="subject" class="form-control"
+                           placeholder="e.g. Mathematics, Physics…"
+                           value="{{ request.args.get('subject', '') }}">
+                </div>
+                <div class="col-12 col-md-4">
+                    <label class="form-label small fw-semibold text-muted">Location <span class="text-muted fw-normal">(optional)</span></label>
+                    <input type="text" name="location" class="form-control"
+                           placeholder="e.g. Delhi, Mumbai…"
+                           value="{{ request.args.get('location', '') }}">
+                </div>
+                <div class="col-12 col-md-3">
+                    <button type="submit" class="btn btn-primary w-100" style="border-radius:8px; padding:10px;">
+                        Search
+                    </button>
+                </div>
+            </div>
         </form>
     </div>
 
-    <div class="results-box">
-        <h3>Results ({{ tutors|length }})</h3>
-        <div class="results-scroll">
-            {% for tutor in tutors %}
-            <div class="tutor-card">
-                <h4>
-                    {{ tutor['name'] }}
-                    <span class="verified-badge">✔ Verified Tutor</span>
-                </h4>
-                <p>📍 {{ tutor['location'] }}</p>
-                <p>🎯 {{ tutor['experience'] }} years experience</p>
-                <p>💻 {{ tutor['mode'] }}</p>
-                {% if tutor['qualification'] %}
-                <p>🎓 {{ tutor['qualification'] }}</p>
-                {% endif %}
-                <a class="view-profile" href="/tutor/{{ tutor['tutor_id'] }}">
-                    🎥 View Profile & Demo Video
-                </a>
-            </div>
-            {% else %}
-            <p>No verified tutors found.</p>
-            {% endfor %}
-        </div>
+    <!-- Results -->
+    <div class="d-flex align-items-center mb-3">
+        <h6 class="fw-semibold mb-0 text-muted">
+            {% if tutors %}
+                {{ tutors|length }} tutor{{ 's' if tutors|length != 1 else '' }} found
+            {% endif %}
+        </h6>
     </div>
 
+    {% if tutors %}
+    <div class="row g-4">
+        {% for tutor in tutors %}
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="tutor-card">
+
+                <!-- Header -->
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="tutor-avatar">{{ tutor['name'][0].upper() }}</div>
+                    <div>
+                        <p class="tutor-name">{{ tutor['name'] }}</p>
+                        <span class="badge-verified">✔ Verified</span>
+                    </div>
+                </div>
+
+                <!-- Info -->
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <div class="info-label">📍 Location</div>
+                        <div class="info-value">{{ tutor['location'] or '—' }}</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="info-label">🎯 Experience</div>
+                        <div class="info-value">{{ tutor['experience'] }} yrs</div>
+                    </div>
+                    <div class="col-12">
+                        <div class="info-label">🎓 Qualification</div>
+                        <div class="info-value">{{ tutor['qualification'] or '—' }}</div>
+                    </div>
+                </div>
+
+                <!-- Demo Video -->
+                {% if tutor['video_path'] %}
+                    {% set video_filename = tutor['video_path'].split('/')[-1] %}
+                    <div class="mb-3">
+                        <div class="info-label mb-1">🎥 Demo Video</div>
+                        <video controls preload="none" style="width:100%; max-height:160px;">
+                            <source src="{{ url_for('static', filename='uploads/videos/' + video_filename) }}" type="video/mp4">
+                        </video>
+                    </div>
+                {% endif %}
+
+                <!-- Buttons -->
+                <div class="d-flex gap-2 mt-2">
+                    <a href="/tutor/{{ tutor['tutor_id'] }}"
+                       class="btn btn-primary btn-sm flex-fill rounded-3 fw-semibold">
+                        View Profile
+                    </a>
+                    {% if tutor['document_path'] %}
+                        {% set doc_filename = tutor['document_path'].split('/')[-1] %}
+                        <a href="{{ url_for('view_document', filename=doc_filename) }}"
+                           target="_blank"
+                           class="btn btn-outline-secondary btn-sm flex-fill rounded-3 fw-semibold">
+                            View Document
+                        </a>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="text-center py-5">
+        <div style="font-size:3rem;">🔍</div>
+        <h5 class="mt-3 fw-semibold text-muted">No tutors found</h5>
+        <p class="text-muted small">Try a different subject or location.</p>
+    </div>
+    {% endif %}
+
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
