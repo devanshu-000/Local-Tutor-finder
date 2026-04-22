@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Review Tutor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; margin: 0; padding: 30px; }
+        .card { max-width: 820px; margin: 0 auto; background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.10); overflow: hidden; }
+        .card-header { background: linear-gradient(135deg, #1a73e8, #0d47a1); color: white; padding: 22px 32px; display: flex; justify-content: space-between; align-items: center; }
+        .card-header h2 { margin: 0; font-size: 1.4rem; }
+        .badge { display: inline-block; border-radius: 20px; padding: 4px 14px; font-size: 0.8rem; font-weight: 700; }
+        .badge-pending  { background: #fff3cd; color: #856404; }
+        .badge-approved { background: #d4edda; color: #155724; }
+        .badge-rejected { background: #f8d7da; color: #721c24; }
+        .card-body { padding: 28px 32px; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 28px; }
+        .info-item { background: #f8f9fa; border-radius: 10px; padding: 14px 18px; }
+        .info-item .label { font-size: 0.72rem; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+        .info-item .value { font-size: 0.95rem; font-weight: 600; color: #333; margin-top: 4px; }
+        .section-title { font-size: 1rem; font-weight: 700; color: #1a73e8; margin: 24px 0 12px; border-bottom: 2px solid #e8f0fe; padding-bottom: 6px; }
+        .doc-preview { border: 1px solid #ddd; border-radius: 10px; overflow: hidden; }
+        .doc-preview iframe { width: 100%; height: 420px; border: none; }
+        .doc-preview img { max-width: 100%; border-radius: 10px; display: block; }
+        .doc-link { display: inline-flex; align-items: center; gap: 8px; background: #e8f0fe; color: #1a73e8; border-radius: 8px; padding: 10px 20px; text-decoration: none; font-weight: 600; margin-bottom: 12px; }
+        video { width: 100%; border-radius: 12px; background: #000; }
+        .action-row { display: flex; gap: 14px; margin-top: 28px; }
+        .btn { flex: 1; padding: 12px; border-radius: 10px; text-align: center; text-decoration: none; font-weight: 700; font-size: 1rem; transition: opacity 0.2s; }
+        .btn:hover { opacity: 0.85; }
+        .btn-approve { background: #34a853; color: white; }
+        .btn-reject  { background: #ea4335; color: white; }
+        .btn-back    { background: #f1f3f4; color: #333; }
+    </style>
+</head>
+<body>
+<div class="card">
+
+    <div class="card-header">
+        <h2>📋 Reviewing: {{ tutor['name'] }}</h2>
+        {% if tutor['verification_status'] == 'pending' %}
+            <span class="badge badge-pending">⏳ Pending</span>
+        {% elif tutor['verification_status'] == 'approved' %}
+            <span class="badge badge-approved">✅ Approved</span>
+        {% else %}
+            <span class="badge badge-rejected">❌ Rejected</span>
+        {% endif %}
+    </div>
+
+    <div class="card-body">
+
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="label">Email</div>
+                <div class="value">{{ tutor['email'] }}</div>
+            </div>
+            <div class="info-item">
+                <div class="label">Phone</div>
+                <div class="value">{{ tutor['phone'] }}</div>
+            </div>
+            <div class="info-item">
+                <div class="label">Location</div>
+                <div class="value">{{ tutor['location'] }}</div>
+            </div>
+            <div class="info-item">
+                <div class="label">Experience</div>
+                <div class="value">{{ tutor['experience'] }} years</div>
+            </div>
+            <div class="info-item">
+                <div class="label">Teaching Mode</div>
+                <div class="value">{{ tutor['mode'] }}</div>
+            </div>
+            <div class="info-item">
+                <div class="label">Qualification</div>
+                <div class="value">{{ tutor['qualification'] if tutor['qualification'] else '—' }}</div>
+            </div>
+        </div>
+
+        <!-- Qualification Document -->
+        <div class="section-title">📄 Qualification Proof Document</div>
+        {% if tutor['document_path'] %}
+            {% set doc_filename = tutor['document_path'].split('/')[-1] %}
+            {% set doc_ext = doc_filename.rsplit('.', 1)[1].lower() %}
+            <a class="doc-link"
+               href="{{ url_for('static', filename='uploads/documents/' + doc_filename) }}"
+               target="_blank">🔗 Open in new tab</a>
+            <div class="doc-preview">
+                {% if doc_ext == 'pdf' %}
+                    <iframe src="{{ url_for('static', filename='uploads/documents/' + doc_filename) }}"></iframe>
+                {% else %}
+                    <img src="{{ url_for('static', filename='uploads/documents/' + doc_filename) }}"
+                         alt="Qualification document">
+                {% endif %}
+            </div>
+        {% else %}
+            <p style="color:#999;">No document was uploaded.</p>
+        {% endif %}
+
+        <!-- Demo Video -->
+        <div class="section-title">🎥 Demo Teaching Video</div>
+        {% if tutor['video_path'] %}
+            {% set video_filename = tutor['video_path'].split('/')[-1] %}
+            <video controls preload="metadata">
+                <source src="{{ url_for('static', filename='uploads/videos/' + video_filename) }}"
+                        type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        {% else %}
+            <p style="color:#999;">No demo video was uploaded.</p>
+        {% endif %}
+
+        <!-- Action Buttons -->
+        <div class="action-row">
+            <a class="btn btn-back" href="/admin">← Back to Dashboard</a>
+            {% if tutor['verification_status'] != 'approved' %}
+            <a class="btn btn-approve" href="/approve/{{ tutor['tutor_id'] }}">✅ Approve Tutor</a>
+            {% endif %}
+            {% if tutor['verification_status'] != 'rejected' %}
+            <a class="btn btn-reject" href="/reject/{{ tutor['tutor_id'] }}"
+               onclick="return confirm('Are you sure you want to reject this tutor?')">
+               ❌ Reject Tutor
+            </a>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,95 @@
+CREATE DATABASE tutor_finder;
+USE tutor_finder;
+CREATE TABLE Tutors (
+    tutor_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    phone VARCHAR(15) UNIQUE NOT NULL,
+    location VARCHAR(100) NOT NULL,
+    experience INT CHECK (experience >= 0),
+    mode ENUM('online', 'offline', 'both') NOT NULL,
+    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending'
+);
+
+CREATE TABLE Students (
+    student_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    phone VARCHAR(15),
+    location VARCHAR(100)
+);
+CREATE TABLE Subjects (
+    subject_id INT PRIMARY KEY AUTO_INCREMENT,
+    subject_name VARCHAR(100) UNIQUE NOT NULL
+);
+
+
+CREATE TABLE Tutor_Subjects (
+    tutor_id INT,
+    subject_id INT,
+    
+    PRIMARY KEY (tutor_id, subject_id),
+    
+    FOREIGN KEY (tutor_id) REFERENCES Tutors(tutor_id) ON DELETE CASCADE,
+    FOREIGN KEY (subject_id) REFERENCES Subjects(subject_id) ON DELETE CASCADE
+);
+
+CREATE TABLE Admins (
+    admin_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100),
+    email VARCHAR(100) UNIQUE NOT NULL
+);
+
+INSERT INTO Subjects (subject_name) VALUES 
+('Math'),
+('Physics'),
+('Chemistry'),
+('English'),
+('Computer Science');
+
+INSERT INTO Tutors (name, email, phone, location, experience, mode, status) VALUES
+('Amit Sharma', 'amit@gmail.com', '9876543210', 'Dehradun', 5, 'offline', 'approved'),
+('Priya Verma', 'priya@gmail.com', '9876543211', 'Delhi', 3, 'online', 'approved'),
+('Rahul Singh', 'rahul@gmail.com', '9876543212', 'Dehradun', 7, 'both', 'pending');
+
+INSERT INTO Tutor_Subjects (tutor_id, subject_id) VALUES
+(1, 1), -- Amit → Math
+(1, 2), -- Amit → Physics
+(2, 5), -- Priya → Computer Science
+(3, 1); -- Rahul → Math
+
+SELECT t.name, t.location, t.mode, s.subject_name
+FROM Tutors t
+JOIN Tutor_Subjects ts ON t.tutor_id = ts.tutor_id
+JOIN Subjects s ON ts.subject_id = s.subject_id
+WHERE s.subject_name = 'Math'
+AND t.location = 'Dehradun'
+AND t.mode IN ('offline', 'both')
+AND t.status = 'approved';
+
+SELECT * FROM Tutors;
+SELECT * FROM Subjects;
+SELECT * FROM Tutor_Subjects;
+
+select location from tutors;
+
+SELECT * FROM subjects;
+SELECT * FROM tutor_subjects;
+DELETE FROM tutors WHERE email='gprem8878@gmail.com';
+SET FOREIGN_KEY_CHECKS = 0;
+
+TRUNCATE TABLE tutor_subjects;
+TRUNCATE TABLE tutors;
+TRUNCATE TABLE subjects;
+
+SET FOREIGN_KEY_CHECKS = 1;
+DROP TABLE admins;
+CREATE TABLE admins (
+    admin_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100),
+    password VARCHAR(100)
+);
+INSERT INTO admins (name, password) VALUES
+('anuj tiwari', 'Anuj@123'),
+('rishabh gupta', 'Rishabh@123'),
+('devanshu petwal', 'Devanshu@123');

@@ -1,0 +1,508 @@
+/* BACKGROUND */
+
+.alert {
+    background: #d4edda;
+    color: #155724;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.search-page {
+    background: linear-gradient(135deg, #1da1c9, #1cc88a);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial;
+}
+
+.search-container {
+    background: white;
+    width: 600px;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0px 10px 30px rgba(0,0,0,0.2);
+}
+
+/* HEADING */
+.heading {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+/* FORM */
+.filters {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.filters input,
+.filters select {
+    padding: 10px;
+    border: none;
+    border-bottom: 2px solid #ccc;
+}
+
+.filters button {
+    padding: 10px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* RESULTS */
+.results-box {
+    margin-top: 15px;
+    max-height: 250px;   /* 🔥 scroll */
+    overflow-y: auto;
+    border-top: 1px solid #ddd;
+    padding-top: 10px;
+}
+
+.tutor-card {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.tutor-card h4 {
+    margin: 0;
+}
+
+/* BACKGROUND */
+.login-page {
+    height: 100vh;
+    background: linear-gradient(135deg, #00c6ff, #c800ff);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* GLASS BOX */
+.login-box {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(15px);
+    padding: 40px;
+    width: 380px;
+    border-radius: 15px;
+    box-shadow: 0px 15px 40px rgba(0,0,0,0.3);
+    text-align: center;
+    color: white;
+}
+
+/* TITLE */
+.login-box h2 {
+    margin-bottom: 20px;
+}
+
+/* ERROR */
+.error-msg {
+    background: rgba(255,0,0,0.7);
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+/* GOOGLE BUTTON */
+.google-btn {
+    width: 100%;
+    padding: 12px;
+    background: white;
+    color: black;
+    border: none;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.google-btn:hover {
+    transform: scale(1.05);
+}
+
+/* INPUT GROUP */
+.input-group {
+    position: relative;
+    margin-bottom: 25px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-bottom: 2px solid white;
+    background: transparent;
+    color: white;
+    outline: none;
+}
+
+/* FLOAT LABEL */
+.input-group label {
+    position: absolute;
+    left: 0;
+    top: -18px;
+    font-size: 14px;
+    color: #ddd;
+}
+
+/* PASSWORD TOGGLE */
+.password-box {
+    position: relative;
+}
+
+.toggle {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    cursor: pointer;
+}
+
+/* BUTTON */
+.login-btn {
+    width: 100%;
+    padding: 12px;
+    background: #000;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.login-btn:hover {
+    background: #333;
+}
+
+/* tutor_register */
+
+/* REGISTER PAGE BACKGROUND */
+.register-page {
+    background: linear-gradient(135deg, #1da1c9, #1cc88a);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial;
+}
+
+/* BOX */
+.register-box {
+    background: white;
+    padding: 30px;
+    width: 400px;
+    border-radius: 10px;
+    box-shadow: 0px 10px 30px rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+/* HEADING */
+.register-box h2 {
+    margin-bottom: 20px;
+}
+
+/* INPUTS */
+.register-box input,
+.register-box select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: none;
+    border-bottom: 2px solid #ccc;
+    outline: none;
+}
+
+/* BUTTON */
+.register-box button {
+    width: 100%;
+    padding: 12px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* SUCCESS MESSAGE */
+.success-msg {
+    background: #28a745;
+    color: white;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+}
+.alert {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.alert.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.alert.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* admin_dashboard */
+
+/* DASHBOARD BACKGROUND */
+.dashboard-page {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+}
+
+/* CONTAINER */
+.dashboard-container {
+    width: 90%;
+    margin: auto;
+    padding: 20px;
+}
+
+/* HEADER */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+}
+
+.logout-btn {
+    background: red;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 8px;
+}
+
+/* STATS CARD */
+.stats-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+    box-shadow: 0px 10px 20px rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+.stats-card h2 {
+    margin: 0;
+}
+
+.stats-card p {
+    font-size: 30px;
+    font-weight: bold;
+    color: #4facfe;
+}
+
+/* TABLE */
+.table-container {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0px 10px 20px rgba(0,0,0,0.2);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+table th {
+    background: #4facfe;
+    color: white;
+    padding: 10px;
+}
+
+table td {
+    padding: 10px;
+    text-align: center;
+}
+
+table tr:nth-child(even) {
+    background: #f2f2f2;
+}
+
+/* APPROVE BUTTON */
+.approve-btn {
+    background: green;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 6px;
+    text-decoration: none;
+}
+
+/* COMMON BACKGROUND STYLE */
+.bg-page {
+    min-height: 100vh;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* DIFFERENT BACKGROUNDS */
+.bg-search {
+    background-image: url('/static/images/bg1.jpg');
+}
+
+.bg-admin {
+    background-image: url('/static/images/bg2.jpg');
+}
+
+.bg-dashboard {
+    background-image: url('/static/images/bg3.jpg');
+}
+
+.bg-register {
+    background-image: url('/static/images/bg1.jpg');
+}
+/* BACKGROUND BASE */
+.bg-page {
+    min-height: 100vh;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* SEARCH PAGE BACKGROUND */
+.bg-search {
+    background-image: url('/static/images/bg1.jpg');
+}
+
+/* DARK OVERLAY (IMPORTANT) */
+.bg-page::before {
+    content: "";
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    top: 0;
+    left: 0;
+    z-index: -1;
+}
+.search-container {
+    position: relative;
+    z-index: 1;
+}
+
+/* 🔥 CENTER ALIGN ALL PAGES */
+.register-container,
+.login-container,
+.search-container,
+.dashboard-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* 🔥 GLASS EFFECT BOX (TRANSPARENT WHITE) */
+.register-box,
+.login-box,
+.filters,
+.table-container {
+    background: rgba(255, 255, 255, 0.15);  /* transparent */
+    backdrop-filter: blur(12px);            /* blur effect */
+    -webkit-backdrop-filter: blur(12px);
+
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0px 10px 30px rgba(0,0,0,0.3);
+}
+
+/* 🔥 TEXT CLEAR */
+.register-box h2,
+.login-box h2 {
+    color: #fff;
+}
+
+/* INPUT COLOR FIX */
+input, select {
+    background: transparent;
+    color: #fff;
+    border-bottom: 1px solid rgba(255,255,255,0.5);
+}
+
+/* PLACEHOLDER COLOR */
+::placeholder {
+    color: rgba(255,255,255,0.7);
+}
+
+/* BUTTON IMPROVE */
+button {
+    background: linear-gradient(45deg, #00c6ff, #0072ff);
+    border: none;
+    color: white;
+}
+
+.dashboard-container {
+    display: block;
+}
+
+/* 🔥 SEARCH PAGE LAYOUT */
+.search-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 30px;
+    padding: 40px;
+}
+
+/* LEFT FILTER */
+.filters {
+    width: 300px;
+}
+
+/* RIGHT RESULTS */
+.results-box {
+    width: 500px;
+}
+
+/* SCROLLABLE RESULTS */
+.results-scroll {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-top: 15px;
+}
+
+/* CARD DESIGN */
+.tutor-card {
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    color: white;
+}
+
+/* TEXT COLOR FIX */
+.filters h2,
+.results-box h3 {
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .search-wrapper {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .filters,
+    .results-box {
+        width: 90%;
+    }
+}

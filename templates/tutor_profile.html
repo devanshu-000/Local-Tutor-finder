@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tutor Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; margin: 0; padding: 20px; }
+        .profile-card { max-width: 780px; margin: 40px auto; background: #fff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.10); overflow: hidden; }
+        .profile-header { background: linear-gradient(135deg, #1a73e8, #0d47a1); color: white; padding: 30px 36px; display: flex; align-items: center; gap: 20px; }
+        .avatar { width: 72px; height: 72px; border-radius: 50%; background: rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; }
+        .profile-header h1 { margin: 0; font-size: 1.6rem; }
+        .profile-header p  { margin: 4px 0 0; opacity: 0.85; font-size: 0.95rem; }
+        .verified-badge { display: inline-block; background: #00c853; color: white; border-radius: 20px; padding: 4px 14px; font-size: 0.8rem; font-weight: 700; margin-top: 8px; }
+        .profile-body { padding: 30px 36px; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
+        .info-item { background: #f8f9fa; border-radius: 10px; padding: 14px 18px; }
+        .info-item .label { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+        .info-item .value { font-size: 1rem; font-weight: 600; color: #333; margin-top: 4px; }
+        .section-title { font-size: 1.1rem; font-weight: 700; color: #1a73e8; margin: 28px 0 12px; border-bottom: 2px solid #e8f0fe; padding-bottom: 8px; }
+        .doc-link { display: inline-flex; align-items: center; gap: 8px; background: #e8f0fe; color: #1a73e8; border-radius: 8px; padding: 10px 20px; text-decoration: none; font-weight: 600; transition: background 0.2s; }
+        .doc-link:hover { background: #d2e3fc; }
+        .video-wrapper { margin-top: 10px; border-radius: 12px; overflow: hidden; background: #000; box-shadow: 0 2px 12px rgba(0,0,0,0.15); }
+        video { width: 100%; display: block; max-height: 420px; }
+        .back-btn { display: inline-block; margin-top: 24px; color: #1a73e8; text-decoration: none; font-weight: 600; }
+        .back-btn:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+<div class="profile-card">
+
+    <div class="profile-header">
+        <div class="avatar">{{ tutor['name'][0].upper() }}</div>
+        <div>
+            <h1>{{ tutor['name'] }}</h1>
+            <p>📧 {{ tutor['email'] }}&nbsp;&nbsp; 📞 {{ tutor['phone'] }}</p>
+            <span class="verified-badge">✔ Verified Tutor</span>
+        </div>
+    </div>
+
+    <div class="profile-body">
+
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="label">📍 Location</div>
+                <div class="value">{{ tutor['location'] }}</div>
+            </div>
+            <div class="info-item">
+                <div class="label">🎯 Experience</div>
+                <div class="value">{{ tutor['experience'] }} years</div>
+            </div>
+            <div class="info-item">
+                <div class="label">💻 Teaching Mode</div>
+                <div class="value">{{ tutor['mode'] }}</div>
+            </div>
+            <div class="info-item">
+                <div class="label">🎓 Qualification</div>
+                <div class="value">{{ tutor['qualification'] if tutor['qualification'] else '—' }}</div>
+            </div>
+        </div>
+
+        <!-- Qualification Proof -->
+        <div class="section-title">📄 Qualification Proof</div>
+        {% if tutor['document_path'] %}
+            {% set doc_filename = tutor['document_path'].split('/')[-1] %}
+            <a class="doc-link"
+               href="{{ url_for('static', filename='uploads/documents/' + doc_filename) }}"
+               target="_blank">
+                📥 View / Download Document
+            </a>
+        {% else %}
+            <p style="color:#999">No document uploaded.</p>
+        {% endif %}
+
+        <!-- Demo Video -->
+        <div class="section-title">🎥 Demo Teaching Video</div>
+        {% if tutor['video_path'] %}
+            {% set video_filename = tutor['video_path'].split('/')[-1] %}
+            <div class="video-wrapper">
+                <video controls preload="metadata">
+                    <source src="{{ url_for('static', filename='uploads/videos/' + video_filename) }}"
+                            type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        {% else %}
+            <p style="color:#999">No demo video uploaded.</p>
+        {% endif %}
+
+        <a class="back-btn" href="/search">← Back to Search</a>
+
+    </div>
+</div>
+</body>
+</html>

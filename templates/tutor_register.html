@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tutor Registration</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* ── upload field styling ── */
+        .file-group { margin-bottom: 16px; }
+        .file-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: #555;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        .file-group input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            border: 2px dashed #aaa;
+            border-radius: 8px;
+            background: #fafafa;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .file-hint {
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 4px;
+        }
+        .pending-badge {
+            display: inline-block;
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffc107;
+            border-radius: 20px;
+            padding: 6px 18px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body class="bg-page bg-register">
+
+<div class="register-container">
+    <div class="register-box">
+
+        <h2>Register as Tutor</h2>
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <!--
+            IMPORTANT: enctype="multipart/form-data" is required for file uploads.
+            Without it, files will NOT be sent to the server.
+        -->
+        <form method="POST" action="/register" enctype="multipart/form-data">
+
+            <!-- Basic info -->
+            <input type="text"   name="name"     placeholder="Full Name"                        required>
+            <input type="email"  name="email"    placeholder="Email Address"                    required>
+            <input type="text"   name="subject"  placeholder="Subject (e.g. Math, Physics)"     required>
+            <input type="text"   name="phone"    placeholder="Phone Number"                     required>
+            <input type="text"   name="location" placeholder="City / Location"                  required>
+            <input type="number" name="experience" placeholder="Experience (years)"  min="0"    required>
+
+            <!-- NEW: Qualification -->
+            <input type="text"   name="qualification"
+                   placeholder="Highest Qualification (e.g. B.Sc Physics, M.Tech)"             required>
+
+            <!-- Mode -->
+            <select name="mode" required>
+                <option value="">Select Teaching Mode</option>
+                <option value="Online">Online</option>
+                <option value="Offline">Offline</option>
+            </select>
+
+            <!-- NEW: Qualification proof document -->
+            <div class="file-group">
+                <label>📄 Upload Qualification Proof *</label>
+                <input type="file" name="document" accept=".pdf,.jpg,.jpeg,.png" required>
+                <p class="file-hint">Accepted: PDF, JPG, PNG &nbsp;|&nbsp; Max size: 5 MB</p>
+            </div>
+
+            <!-- NEW: Demo teaching video -->
+            <div class="file-group">
+                <label>🎥 Upload Demo Teaching Video *</label>
+                <input type="file" name="video" accept=".mp4" required>
+                <p class="file-hint">Accepted: MP4 &nbsp;|&nbsp; Max size: 50 MB</p>
+            </div>
+
+            <button type="submit">Create Account</button>
+
+        </form>
+
+        <!-- Show pending badge after successful registration -->
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="pending-badge">⏳ Pending Verification</div>
+        {% endif %}
+        {% endwith %}
+
+    </div>
+</div>
+
+</body>
+</html>

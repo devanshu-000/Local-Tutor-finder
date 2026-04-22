@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Tutors</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .verified-badge { display: inline-block; background: #00c853; color: white; border-radius: 20px; padding: 3px 12px; font-size: 0.75rem; font-weight: 700; margin-left: 8px; vertical-align: middle; }
+        .tutor-card a.view-profile { display: inline-block; margin-top: 10px; background: #1a73e8; color: white; padding: 7px 18px; border-radius: 8px; text-decoration: none; font-size: 0.85rem; font-weight: 600; }
+        .tutor-card a.view-profile:hover { background: #1558b0; }
+    </style>
+</head>
+<body class="bg-page bg-register">
+<div class="search-wrapper">
+
+    <div class="filters">
+        <h2>Search Tutors</h2>
+        <form method="GET" action="/search">
+            <input type="text" name="subject"  placeholder="Enter Subject">
+            <input type="text" name="location" placeholder="Enter Location">
+            <select name="mode">
+                <option value="">Any Mode</option>
+                <option value="Online">Online</option>
+                <option value="Offline">Offline</option>
+            </select>
+            <button type="submit">Search</button>
+        </form>
+    </div>
+
+    <div class="results-box">
+        <h3>Results ({{ tutors|length }})</h3>
+        <div class="results-scroll">
+            {% for tutor in tutors %}
+            <div class="tutor-card">
+                <h4>
+                    {{ tutor['name'] }}
+                    <span class="verified-badge">✔ Verified Tutor</span>
+                </h4>
+                <p>📍 {{ tutor['location'] }}</p>
+                <p>🎯 {{ tutor['experience'] }} years experience</p>
+                <p>💻 {{ tutor['mode'] }}</p>
+                {% if tutor['qualification'] %}
+                <p>🎓 {{ tutor['qualification'] }}</p>
+                {% endif %}
+                <a class="view-profile" href="/tutor/{{ tutor['tutor_id'] }}">
+                    🎥 View Profile & Demo Video
+                </a>
+            </div>
+            {% else %}
+            <p>No verified tutors found.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="bg-page bg-admin">
+
+<div class="login-container">
+
+    <div class="login-box">
+
+        <h2>Admin Login</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, msg in messages %}
+        <div class="alert {{ category }}">{{ msg }}</div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <button type="button" class="google-btn">
+            <img src="https://cdn-icons-png.flaticon.com/512/281/281764.png" width="20">
+            Continue with Google
+        </button>
+
+        <form method="POST" action="/admin_login" autocomplete="off">
+
+            <div class="input-group">
+                <input type="text" name="name" required>
+                <label>Admin Name</label>
+            </div>
+
+            <div class="input-group password-box">
+                <input type="password" name="password" id="password" required>
+                <label>Password</label>
+                <span class="toggle" onclick="togglePassword()">👁️</span>
+            </div>
+
+            <button type="submit" class="login-btn">Sign In</button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+function togglePassword() {
+    let pass = document.getElementById("password");
+    pass.type = pass.type === "password" ? "text" : "password";
+}
+</script>
+
+</body>
+</html>
