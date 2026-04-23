@@ -1,114 +1,389 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Tutor Registration</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutor Registration – TutorFinder</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        /* ── upload field styling ── */
-        .file-group { margin-bottom: 16px; }
-        .file-group label {
-            display: block;
-            font-size: 0.85rem;
-            color: #555;
-            margin-bottom: 6px;
-            font-weight: 600;
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a0533 0%, #3d1a6e 35%, #6a1fa0 65%, #c040d0 100%);
+            position: relative;
+            overflow-x: hidden;
+            color: white;
         }
-        .file-group input[type="file"] {
-            width: 100%;
-            padding: 8px;
-            border: 2px dashed #aaa;
-            border-radius: 8px;
-            background: #fafafa;
-            cursor: pointer;
-            font-size: 0.9rem;
+
+        /* Floating orbs */
+        body::before {
+            content: '';
+            position: fixed;
+            width: 600px; height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(180, 80, 220, 0.35) 0%, transparent 70%);
+            top: -180px; right: -180px;
+            pointer-events: none;
+            z-index: 0;
+            animation: floatA 9s ease-in-out infinite;
         }
-        .file-hint {
-            font-size: 0.75rem;
-            color: #888;
-            margin-top: 4px;
+        body::after {
+            content: '';
+            position: fixed;
+            width: 500px; height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(100, 30, 200, 0.3) 0%, transparent 70%);
+            bottom: -120px; left: -120px;
+            pointer-events: none;
+            z-index: 0;
+            animation: floatB 11s ease-in-out infinite;
         }
-        .pending-badge {
-            display: inline-block;
-            background: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffc107;
+        @keyframes floatA { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-30px,25px)} }
+        @keyframes floatB { 0%,100%{transform:translate(0,0)} 50%{transform:translate(25px,-30px)} }
+
+        /* Navbar */
+        nav {
+            position: sticky; top: 0; z-index: 100;
+            padding: 14px 32px;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(0,0,0,0.25);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .brand {
+            font-size: 1.25rem; font-weight: 800; color: white;
+            text-decoration: none; display: flex; align-items: center; gap: 8px;
+        }
+        .brand span {
+            background: linear-gradient(135deg, #c8aaff, #f093fb);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .nav-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 18px; border-radius: 9px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white; text-decoration: none;
+            font-weight: 600; font-size: 0.85rem;
+            transition: background 0.2s;
+        }
+        .nav-link:hover { background: rgba(255,255,255,0.2); }
+
+        /* Page wrap */
+        .page-wrap {
+            position: relative; z-index: 1;
+            max-width: 720px; margin: 0 auto;
+            padding: 44px 20px 80px;
+        }
+
+        /* Page header */
+        .page-header { text-align: center; margin-bottom: 36px; }
+        .top-icon {
+            width: 68px; height: 68px;
             border-radius: 20px;
-            padding: 6px 18px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin-top: 10px;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            box-shadow: 0 10px 32px rgba(240,147,251,0.5);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.9rem;
+            margin: 0 auto 18px;
         }
+        .page-header h2 {
+            font-size: 2rem; font-weight: 900; color: white;
+            margin-bottom: 8px; letter-spacing: -0.3px;
+        }
+        .page-header p { color: rgba(255,255,255,0.55); font-size: 0.92rem; }
+
+        /* Flash messages */
+        .flash-msg {
+            padding: 13px 18px; border-radius: 12px;
+            font-weight: 600; font-size: 0.88rem;
+            margin-bottom: 20px;
+        }
+        .flash-success { background: rgba(67,233,123,0.15); border: 1px solid rgba(67,233,123,0.35); color: #43e97b; }
+        .flash-error   { background: rgba(245,87,108,0.15); border: 1px solid rgba(245,87,108,0.35); color: #f5576c; }
+
+        /* Form sections */
+        .form-section {
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 22px;
+            padding: 30px 32px;
+            margin-bottom: 22px;
+        }
+
+        /* Section label */
+        .section-label {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 0.72rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.9px;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 22px;
+        }
+        .section-label::after {
+            content: ''; flex: 1; height: 1px;
+            background: rgba(255,255,255,0.1);
+        }
+        .step-num {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 22px; height: 22px; border-radius: 50%;
+            background: linear-gradient(135deg, #c8aaff, #f093fb);
+            font-size: 0.68rem; font-weight: 800;
+            color: #3d1a6e; flex-shrink: 0;
+        }
+
+        /* Grid */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+        @media (max-width: 580px) { .two-col { grid-template-columns: 1fr; } }
+
+        /* Field */
+        .field { display: flex; flex-direction: column; gap: 8px; }
+
+        /* Label */
+        label.fl {
+            font-size: 0.78rem; font-weight: 700;
+            color: rgba(255,255,255,0.65);
+            text-transform: uppercase; letter-spacing: 0.4px;
+        }
+
+        /* Input */
+        input[type="text"],
+        input[type="email"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.1);
+            border: 1.5px solid rgba(255,255,255,0.18);
+            border-radius: 11px;
+            color: white;
+            font-size: 0.93rem;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+            -webkit-appearance: none;
+        }
+        input::placeholder { color: rgba(255,255,255,0.35); }
+        input:focus, select:focus {
+            border-color: rgba(200,170,255,0.7);
+            background: rgba(255,255,255,0.14);
+            box-shadow: 0 0 0 3px rgba(200,170,255,0.18);
+        }
+        select option { background: #3d1a6e; color: white; }
+
+        /* Upload zone */
+        .upload-zone {
+            border: 2px dashed rgba(255,255,255,0.22);
+            border-radius: 14px;
+            padding: 26px 20px;
+            text-align: center;
+            background: rgba(255,255,255,0.05);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.22s;
+        }
+        .upload-zone:hover {
+            border-color: rgba(200,170,255,0.55);
+            background: rgba(255,255,255,0.1);
+        }
+        .upload-zone input[type="file"] {
+            position: absolute; inset: 0;
+            opacity: 0; cursor: pointer;
+            width: 100%; height: 100%;
+        }
+        .upload-zone .uz-icon { font-size: 2.2rem; margin-bottom: 8px; }
+        .upload-zone .uz-title { font-weight: 600; font-size: 0.9rem; color: rgba(255,255,255,0.8); }
+        .upload-zone .uz-hint  { font-size: 0.75rem; color: rgba(255,255,255,0.38); margin-top: 5px; }
+        .upload-zone .uz-name  { display: none; margin-top: 10px; font-size: 0.8rem; font-weight: 600; color: #43e97b; }
+        .upload-zone.done { border-color: rgba(67,233,123,0.5); background: rgba(67,233,123,0.07); }
+
+        /* Submit button */
+        .btn-submit {
+            display: block; width: 100%;
+            padding: 15px;
+            border-radius: 14px;
+            border: none;
+            font-weight: 800;
+            font-size: 1.05rem;
+            background: linear-gradient(135deg, #f093fb 0%, #c040d0 50%, #f5576c 100%);
+            box-shadow: 0 8px 32px rgba(240,147,251,0.5);
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+            letter-spacing: 0.2px;
+        }
+        .btn-submit:hover { transform: translateY(-2px); opacity: 0.93; }
+        .btn-submit:active { transform: translateY(0); }
+
+        /* Pending notice */
+        .pending-notice {
+            background: rgba(255,210,0,0.1);
+            border: 1px solid rgba(255,210,0,0.3);
+            border-radius: 12px;
+            padding: 13px 18px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #ffd200;
+            text-align: center;
+            margin-top: 18px;
+        }
+
+        .footer-note {
+            text-align: center;
+            color: rgba(255,255,255,0.35);
+            font-size: 0.85rem;
+            margin-top: 26px;
+        }
+        .footer-note a { color: rgba(255,255,255,0.65); font-weight: 600; }
     </style>
 </head>
+<body>
 
-<body class="bg-page bg-register">
+<nav>
+    <a href="/" class="brand">🎓 <span>TutorFinder</span></a>
+    <a href="/" class="nav-link">← Home</a>
+</nav>
 
-<div class="register-container">
-    <div class="register-box">
+<div class="page-wrap">
 
-        <h2>Register as Tutor</h2>
-
-        <!-- Flash messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-            <div class="alert {{ category }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-        {% endwith %}
-
-        <!--
-            IMPORTANT: enctype="multipart/form-data" is required for file uploads.
-            Without it, files will NOT be sent to the server.
-        -->
-        <form method="POST" action="/register" enctype="multipart/form-data">
-
-            <!-- Basic info -->
-            <input type="text"   name="name"     placeholder="Full Name"                        required>
-            <input type="email"  name="email"    placeholder="Email Address"                    required>
-            <input type="text"   name="subject"  placeholder="Subject (e.g. Math, Physics)"     required>
-            <input type="text"   name="phone"    placeholder="Phone Number"                     required>
-            <input type="text"   name="location" placeholder="City / Location"                  required>
-            <input type="number" name="experience" placeholder="Experience (years)"  min="0"    required>
-
-            <!-- NEW: Qualification -->
-            <input type="text"   name="qualification"
-                   placeholder="Highest Qualification (e.g. B.Sc Physics, M.Tech)"             required>
-
-            <!-- Mode -->
-            <select name="mode" required>
-                <option value="">Select Teaching Mode</option>
-                <option value="Online">Online</option>
-                <option value="Offline">Offline</option>
-            </select>
-
-            <!-- NEW: Qualification proof document -->
-            <div class="file-group">
-                <label>📄 Upload Qualification Proof *</label>
-                <input type="file" name="document" accept=".pdf,.jpg,.jpeg,.png" required>
-                <p class="file-hint">Accepted: PDF, JPG, PNG &nbsp;|&nbsp; Max size: 5 MB</p>
-            </div>
-
-            <!-- NEW: Demo teaching video -->
-            <div class="file-group">
-                <label>🎥 Upload Demo Teaching Video *</label>
-                <input type="file" name="video" accept=".mp4" required>
-                <p class="file-hint">Accepted: MP4 &nbsp;|&nbsp; Max size: 50 MB</p>
-            </div>
-
-            <button type="submit">Create Account</button>
-
-        </form>
-
-        <!-- Show pending badge after successful registration -->
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <div class="pending-badge">⏳ Pending Verification</div>
-        {% endif %}
-        {% endwith %}
-
+    <div class="page-header">
+        <div class="top-icon">📚</div>
+        <h2>Register as a Tutor</h2>
+        <p>Complete your profile to get verified and listed on TutorFinder.</p>
     </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash-msg {{ 'flash-success' if category == 'success' else 'flash-error' }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="/register" enctype="multipart/form-data">
+
+        <!-- Step 1: Personal Info -->
+        <div class="form-section">
+            <div class="section-label">
+                <span class="step-num">1</span> Personal Information
+            </div>
+            <div class="two-col">
+                <div class="field">
+                    <label class="fl">Full Name *</label>
+                    <input type="text" name="name" placeholder="e.g. Amit Kumar" required>
+                </div>
+                <div class="field">
+                    <label class="fl">Email Address *</label>
+                    <input type="email" name="email" placeholder="you@example.com" required>
+                </div>
+                <div class="field">
+                    <label class="fl">Phone Number *</label>
+                    <input type="text" name="phone" placeholder="+91 98765 43210" required>
+                </div>
+                <div class="field">
+                    <label class="fl">City / Location *</label>
+                    <input type="text" name="location" placeholder="e.g. Delhi, Mumbai" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Teaching Details -->
+        <div class="form-section">
+            <div class="section-label">
+                <span class="step-num">2</span> Teaching Details
+            </div>
+            <div class="two-col">
+                <div class="field">
+                    <label class="fl">Subject *</label>
+                    <input type="text" name="subject" placeholder="e.g. Mathematics, Physics" required>
+                </div>
+                <div class="field">
+                    <label class="fl">Teaching Mode *</label>
+                    <select name="mode" required>
+                        <option value="">Select Mode</option>
+                        <option value="Online">Online</option>
+                        <option value="Offline">Offline (In-person)</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label class="fl">Highest Qualification *</label>
+                    <input type="text" name="qualification" placeholder="e.g. M.Sc Physics" required>
+                </div>
+                <div class="field">
+                    <label class="fl">Years of Experience *</label>
+                    <input type="number" name="experience" placeholder="e.g. 3" min="0" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Documents -->
+        <div class="form-section">
+            <div class="section-label">
+                <span class="step-num">3</span> Documents & Demo Video
+            </div>
+            <div class="two-col">
+                <div class="field">
+                    <label class="fl">Qualification Proof *</label>
+                    <div class="upload-zone" id="docZone">
+                        <input type="file" name="document" accept=".pdf,.jpg,.jpeg,.png"
+                               required onchange="onFile('docZone','docName',this)">
+                        <div class="uz-icon">📄</div>
+                        <div class="uz-title">Click to upload</div>
+                        <div class="uz-hint">PDF · JPG · PNG &nbsp;·&nbsp; Max 5 MB</div>
+                        <div class="uz-name" id="docName"></div>
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="fl">Demo Teaching Video *</label>
+                    <div class="upload-zone" id="videoZone">
+                        <input type="file" name="video" accept=".mp4"
+                               required onchange="onFile('videoZone','videoName',this)">
+                        <div class="uz-icon">🎥</div>
+                        <div class="uz-title">Click to upload</div>
+                        <div class="uz-hint">MP4 only &nbsp;·&nbsp; Max 50 MB</div>
+                        <div class="uz-name" id="videoName"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-submit">Create Tutor Account →</button>
+
+    </form>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="pending-notice">
+        ⏳ Your profile is under review. Admin will verify your documents and approve your listing.
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <p class="footer-note">
+        Already registered? <a href="/">Go to Home</a>
+    </p>
 </div>
 
+<script>
+function onFile(zoneId, nameId, input) {
+    const zone = document.getElementById(zoneId);
+    const nameEl = document.getElementById(nameId);
+    if (input.files && input.files[0]) {
+        zone.classList.add('done');
+        nameEl.style.display = 'block';
+        nameEl.textContent = '✔ ' + input.files[0].name;
+    }
+}
+</script>
 </body>
 </html>
