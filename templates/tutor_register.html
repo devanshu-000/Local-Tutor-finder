@@ -263,9 +263,15 @@
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
         {% for category, message in messages %}
-        <div class="flash-msg {{ 'flash-success' if category == 'success' else 'flash-error' }}">
-            {{ message }}
-        </div>
+            {% if category == 'success' %}
+            <div class="pending-notice" style="margin-bottom:18px;">
+                ⏳ {{ message }}
+            </div>
+            {% else %}
+            <div class="flash-msg flash-error">
+                {{ message }}
+            </div>
+            {% endif %}
         {% endfor %}
     {% endif %}
     {% endwith %}
@@ -361,13 +367,6 @@
 
     </form>
 
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <div class="pending-notice">
-        ⏳ Your profile is under review. Admin will verify your documents and approve your listing.
-    </div>
-    {% endif %}
-    {% endwith %}
 
     <p class="footer-note">
         Already registered? <a href="/">Go to Home</a>
