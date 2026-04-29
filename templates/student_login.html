@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Login – TutorFinder</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #f4f6fb; min-height: 100vh; display: flex; flex-direction: column; }
+        .login-card {
+            max-width: 420px;
+            margin: auto;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.09);
+            padding: 44px 40px;
+        }
+        .login-card h2 { font-weight: 800; font-size: 1.5rem; color: #1a1a2e; }
+        .form-control { border-radius: 8px; padding: 10px 14px; }
+        .btn-login { width: 100%; padding: 11px; border-radius: 8px; font-weight: 600; font-size: 1rem; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-light bg-white shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-primary" href="/">🎓 TutorFinder</a>
+    </div>
+</nav>
+
+<div class="container flex-grow-1 d-flex align-items-center py-5">
+    <div class="login-card w-100">
+        <div class="text-center mb-4">
+            <div style="font-size:2.5rem;">🎓</div>
+            <h2 class="mt-2">Student Access</h2>
+            <p class="text-muted small">Enter your name to browse verified tutors</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, msg in messages %}
+            <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} rounded-3 py-2">{{ msg }}</div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="/student-login">
+            <div class="mb-3">
+                <label class="form-label fw-semibold small text-muted">Your Name</label>
+                <input type="text" name="name" class="form-control" placeholder="e.g. Rahul Sharma" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-login mt-2">Browse Tutors →</button>
+        </form>
+
+        <div class="text-center mt-4">
+            <a href="/" class="text-muted small">← Back to Home</a>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Tutors – TutorFinder</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #f4f6fb; }
+
+        /* ── Navbar ── */
+        .navbar { background: #fff; box-shadow: 0 1px 8px rgba(0,0,0,0.07); }
+
+        /* ── Search card ── */
+        .search-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 14px rgba(0,0,0,0.07);
+            padding: 26px 30px;
+        }
+        .form-control, .form-select {
+            border-radius: 9px;
+            border: 1.5px solid #e0e0e0;
+            padding: 10px 14px;
+            font-size: 0.93rem;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #1a73e8;
+            box-shadow: 0 0 0 3px rgba(26,115,232,0.1);
+        }
+        .btn-search {
+            background: #1a73e8;
+            color: #fff;
+            border: none;
+            border-radius: 9px;
+            padding: 10px 20px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            width: 100%;
+            transition: background 0.2s;
+        }
+        .btn-search:hover { background: #1558b0; color: #fff; }
+
+        /* ── Tutor card ── */
+        .tutor-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            padding: 22px;
+            height: 100%;
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+        }
+        .tutor-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 26px rgba(0,0,0,0.12);
+        }
+
+        /* Avatar */
+        .tutor-avatar {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            background: #e8f0fe;
+            color: #1a73e8;
+            font-size: 1.3rem;
+            font-weight: 800;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .tutor-name { font-size: 1.05rem; font-weight: 800; color: #1a1a2e; margin: 0; }
+
+        /* Badges */
+        .badge-verified {
+            background: #e6f4ea; color: #1e7e34;
+            font-size: 0.7rem; font-weight: 700;
+            padding: 3px 10px; border-radius: 20px;
+            display: inline-block;
+        }
+        .subject-pill {
+            background: #e8f0fe; color: #1a73e8;
+            font-size: 0.73rem; font-weight: 700;
+            padding: 3px 10px; border-radius: 20px;
+            display: inline-block; margin: 2px 2px 2px 0;
+        }
+        .mode-pill {
+            background: #fff8e1; color: #e65100;
+            font-size: 0.73rem; font-weight: 700;
+            padding: 3px 10px; border-radius: 20px;
+            display: inline-block;
+        }
+
+        /* Info grid */
+        .info-label { font-size: 0.68rem; color: #aaa; text-transform: uppercase; letter-spacing: 0.4px; }
+        .info-value { font-size: 0.88rem; font-weight: 700; color: #333; }
+
+        /* Divider */
+        .card-divider { border: none; border-top: 1px solid #f0f0f0; margin: 14px 0; }
+
+        /* Action buttons */
+        .btn-profile {
+            background: #1a73e8; color: #fff;
+            border: none; border-radius: 8px;
+            padding: 8px 0; font-weight: 700;
+            font-size: 0.83rem; flex: 1;
+            text-align: center; text-decoration: none;
+            transition: background 0.2s;
+        }
+        .btn-profile:hover { background: #1558b0; color: #fff; }
+        .btn-doc {
+            background: #f8f9fa; color: #555;
+            border: 1.5px solid #e0e0e0; border-radius: 8px;
+            padding: 8px 0; font-weight: 700;
+            font-size: 0.83rem; flex: 1;
+            text-align: center; text-decoration: none;
+            transition: background 0.2s;
+        }
+        .btn-doc:hover { background: #e8f0fe; color: #1a73e8; border-color: #1a73e8; }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center; padding: 60px 20px;
+        }
+        .empty-icon { font-size: 3.5rem; }
+
+        /* Video */
+        video { border-radius: 10px; background: #000; }
+
+        /* Result summary */
+        .result-summary {
+            font-size: 0.88rem; color: #666; font-weight: 600; margin-bottom: 16px;
+        }
+        .result-summary strong { color: #1a73e8; }
+    </style>
+</head>
+<body>
+
+<!-- ── Navbar ── -->
+<nav class="navbar navbar-light mb-4">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-primary fs-5" href="/">🎓 TutorFinder</a>
+        <div class="d-flex align-items-center gap-3">
+            {% if session.get('student_name') %}
+                <span class="text-muted small fw-semibold">👤 {{ session['student_name'] }}</span>
+                <a href="/student-logout" class="btn btn-sm btn-outline-secondary rounded-3">Logout</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+<div class="container pb-5">
+
+    <!-- ── Search Form ── -->
+    <div class="search-card mb-4">
+        <h5 class="fw-bold mb-3">🔍 Find a Tutor</h5>
+        <form method="GET" action="/search">
+            <div class="row g-2 align-items-end">
+
+                <!-- Subject -->
+                <div class="col-12 col-md-4">
+                    <label class="form-label small fw-semibold text-muted mb-1">Subject</label>
+                    <input type="text" name="subject" class="form-control"
+                           placeholder="e.g. Maths, Physics, English…"
+                           value="{{ subject }}">
+                </div>
+
+                <!-- Location -->
+                <div class="col-12 col-md-3">
+                    <label class="form-label small fw-semibold text-muted mb-1">
+                        Location <span class="fw-normal">(optional)</span>
+                    </label>
+                    <input type="text" name="location" class="form-control"
+                           placeholder="e.g. Delhi, Mumbai…"
+                           value="{{ location }}">
+                </div>
+
+                <!-- Mode -->
+                <div class="col-12 col-md-3">
+                    <label class="form-label small fw-semibold text-muted mb-1">
+                        Mode <span class="fw-normal">(optional)</span>
+                    </label>
+                    <select name="mode" class="form-select">
+                        <option value="">Any Mode</option>
+                        <option value="online"  {% if mode == 'online'  %}selected{% endif %}>Online</option>
+                        <option value="offline" {% if mode == 'offline' %}selected{% endif %}>Offline</option>
+                        <option value="both"    {% if mode == 'both'    %}selected{% endif %}>Both</option>
+                    </select>
+                </div>
+
+                <!-- Button -->
+                <div class="col-12 col-md-2">
+                    <button type="submit" class="btn-search">Search</button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+
+    <!-- ── Result Summary ── -->
+    {% if tutors %}
+    <p class="result-summary">
+        <strong>{{ tutors | length }}</strong>
+        tutor{{ 's' if tutors | length != 1 else '' }} found
+        {% if subject %} for subject "<strong>{{ subject }}</strong>"{% endif %}
+        {% if location %} in "<strong>{{ location }}</strong>"{% endif %}
+        {% if mode %} · mode: <strong>{{ mode }}</strong>{% endif %}
+    </p>
+    {% endif %}
+
+    <!-- ── Tutor Cards ── -->
+    {% if tutors %}
+    <div class="row g-4">
+        {% for tutor in tutors %}
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="tutor-card">
+
+                <!-- Header row -->
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="tutor-avatar">{{ tutor['name'][0].upper() }}</div>
+                    <div>
+                        <p class="tutor-name">{{ tutor['name'] }}</p>
+                        <span class="badge-verified">✔ Verified</span>
+                    </div>
+                </div>
+
+                <!-- Subjects -->
+                <div class="mb-2">
+                    <div class="info-label mb-1">📚 Subjects</div>
+                    {% if tutor['subjects'] %}
+                        {% for sub in tutor['subjects'].split(', ') %}
+                            <span class="subject-pill">{{ sub | title }}</span>
+                        {% endfor %}
+                    {% else %}
+                        <span class="text-muted small">—</span>
+                    {% endif %}
+                </div>
+
+                <hr class="card-divider">
+
+                <!-- Info grid -->
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <div class="info-label">📍 Location</div>
+                        <div class="info-value">{{ tutor['location'] or '—' }}</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="info-label">🎯 Experience</div>
+                        <div class="info-value">{{ tutor['experience'] }} yrs</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="info-label">🎓 Qualification</div>
+                        <div class="info-value">{{ tutor['qualification'] or '—' }}</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="info-label">💻 Mode</div>
+                        <div class="info-value">
+                            <span class="mode-pill">{{ tutor['mode'] | capitalize }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Demo video -->
+                {% if tutor['video_path'] %}
+                    {% set vf = tutor['video_path'].split('/')[-1] %}
+                    <div class="mb-3">
+                        <div class="info-label mb-1">🎥 Demo Video</div>
+                        <video controls preload="none" style="width:100%; max-height:160px;">
+                            <source src="{{ url_for('static', filename='uploads/videos/' + vf) }}"
+                                    type="video/mp4">
+                        </video>
+                    </div>
+                {% endif %}
+
+                <!-- Action buttons -->
+                <div class="d-flex gap-2 mt-2">
+                    <a href="/tutor/{{ tutor['tutor_id'] }}" class="btn-profile">
+                        View Profile
+                    </a>
+                    {% if tutor['document_path'] %}
+                        {% set df = tutor['document_path'].split('/')[-1] %}
+                        <a href="{{ url_for('view_document', filename=df) }}"
+                           target="_blank" class="btn-doc">
+                            View Doc
+                        </a>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- ── Empty State ── -->
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">🔍</div>
+        <h5 class="mt-3 fw-bold text-muted">No tutors found</h5>
+        <p class="text-muted small mt-1">
+            {% if subject or location %}
+                No approved tutors match <strong>{{ subject or '' }}</strong>
+                {% if location %}in <strong>{{ location }}</strong>{% endif %}.
+                <br>Try different keywords or leave fields blank to see all tutors.
+            {% else %}
+                No approved tutors yet. Check back later!
+            {% endif %}
+        </p>
+        {% if subject or location or mode %}
+        <a href="/search" class="btn btn-outline-primary btn-sm rounded-3 mt-3 fw-semibold">
+            Clear filters → Show all tutors
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

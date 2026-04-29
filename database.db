@@ -1,0 +1,52 @@
+-- ============================================================
+-- RUN THIS IN MySQL Workbench or phpMyAdmin or MySQL terminal
+-- This fixes the "No tutors found" bug by syncing your
+-- database schema with what app.py expects
+-- ============================================================
+
+USE tutor_finder;
+
+-- STEP 1: Add missing columns to tutors table (if they don't exist)
+-- These columns are needed by app.py but missing from original schema
+
+ALTER TABLE tutors
+    ADD COLUMN IF NOT EXISTS qualification VARCHAR(200) DEFAULT NULL,
+    ADD COLUMN IF NOT EXISTS document_path VARCHAR(300) DEFAULT NULL,
+    ADD COLUMN IF NOT EXISTS video_path VARCHAR(300) DEFAULT NULL,
+    ADD COLUMN IF NOT EXISTS verification_status VARCHAR(20) DEFAULT 'pending';
+
+-- STEP 2: Fix existing tutors that were approved but have wrong/null verification_status
+-- This is the MAIN fix — syncs verification_status with status
+
+UPDATE tutors
+SET verification_status = 'approved'
+WHERE LOWER(status) = 'approved';
+
+UPDATE tutors
+SET verification_status = 'pending'
+WHERE LOWER(status) = 'pending' OR verification_status IS NULL;
+
+UPDATE tutors
+SET verification_status = 'rejected'
+WHERE LOWER(status) = 'rejected';
+
+-- STEP 3: Make sure the subjects table is lowercase to match search
+-- (search uses LOWER() but let's keep data clean)
+UPDATE subjects SET subject_name = LOWER(subject_name);
+
+-- STEP 4: Verify the fix - run this SELECT to confirm tutors show up
+SELECT
+    t.tutor_id,
+    t.name,
+    t.location,
+    t.status,
+    t.verification_status,
+    s.subject_name
+FROM tutors t
+LEFT JOIN tutor_subjects ts ON t.tutor_id = ts.tutor_id
+LEFT JOIN subjects s ON ts.subject_id = s.subject_id
+WHERE LOWER(t.verification_status) = 'approved';
+
+-- You should now see your approved tutors listed above.
+-- If the list is empty, run this to see ALL tutors and their current status:
+-- SELECT tutor_id, name, status, verification_status FROM tutors;
