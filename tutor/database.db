@@ -1,0 +1,73 @@
+-- ============================================================
+-- FULL DATABASE SETUP — tutor_finder
+-- Run this once to create all tables from scratch.
+-- If tables already exist, the IF NOT EXISTS clauses skip them.
+-- ============================================================
+
+CREATE DATABASE IF NOT EXISTS tutor_finder
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
+
+USE tutor_finder;
+
+-- ── 1. admins ─────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS admins (
+    admin_id   INT          NOT NULL AUTO_INCREMENT,
+    name       VARCHAR(100) NOT NULL,
+    password   VARCHAR(255) NOT NULL,
+    PRIMARY KEY (admin_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Default admin account (change password after first login)
+INSERT IGNORE INTO admins (admin_id, name, password)
+VALUES (1, 'admin', 'admin123');
+
+-- ── 2. tutors ─────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS tutors (
+    tutor_id            INT          NOT NULL AUTO_INCREMENT,
+    name                VARCHAR(150) NOT NULL,
+    email               VARCHAR(150) NOT NULL UNIQUE,
+    phone               VARCHAR(20)  DEFAULT NULL,
+    location            VARCHAR(200) DEFAULT NULL,
+    experience          VARCHAR(50)  DEFAULT NULL,
+    mode                VARCHAR(20)  DEFAULT NULL,        -- 'online' | 'offline' | 'both'
+    status              VARCHAR(20)  DEFAULT 'pending',   -- 'pending' | 'approved' | 'rejected'
+    qualification       VARCHAR(200) DEFAULT NULL,
+    document_path       VARCHAR(300) DEFAULT NULL,
+    video_path          VARCHAR(300) DEFAULT NULL,
+    verification_status VARCHAR(20)  DEFAULT 'pending',  -- must stay in sync with status
+    PRIMARY KEY (tutor_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ── 3. subjects ───────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS subjects (
+    subject_id   INT          NOT NULL AUTO_INCREMENT,
+    subject_name VARCHAR(150) NOT NULL,
+    PRIMARY KEY (subject_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ── 4. tutor_subjects (many-to-many join) ─────────────────
+CREATE TABLE IF NOT EXISTS tutor_subjects (
+    id         INT NOT NULL AUTO_INCREMENT,
+    tutor_id   INT NOT NULL,
+    subject_id INT NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (tutor_id)   REFERENCES tutors   (tutor_id)   ON DELETE CASCADE,
+    FOREIGN KEY (subject_id) REFERENCES subjects (subject_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ── 5. Add missing columns to tutors if upgrading old DB ──
+ALTER TABLE tutors
+    ADD COLUMN IF NOT EXISTS qualification       VARCHAR(200) DEFAULT NULL,
+    ADD COLUMN IF NOT EXISTS document_path       VARCHAR(300) DEFAULT NULL,
+    ADD COLUMN IF NOT EXISTS video_path          VARCHAR(300) DEFAULT NULL,
+    ADD COLUMN IF NOT EXISTS verification_status VARCHAR(20)  DEFAULT 'pending';
+
+-- ── 6. Sync verification_status for any existing rows ─────
+UPDATE tutors SET verification_status = 'approved' WHERE LOWER(status) = 'approved';
+UPDATE tutors SET verification_status = 'rejected' WHERE LOWER(status) = 'rejected';
+UPDATE tutors SET verification_status = 'pending'
+    WHERE LOWER(status) = 'pending' OR verification_status IS NULL;
+
+-- ── 7. Normalise subjects to lowercase ────────────────────
+UPDATE subjects SET subject_name = LOWER(TRIM(subject_name));
